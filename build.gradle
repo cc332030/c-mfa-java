@@ -1,0 +1,67 @@
+def ext = rootProject.ext
+def versions = ext.versions
+
+buildscript {
+
+  apply from: 'config.gradle'
+
+  repositories {
+    maven {
+      url 'https://nexus.local.c332030.com/repository/maven-public/'
+    }
+  }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+repositories {
+  maven {
+    url 'https://nexus.local.c332030.com/repository/maven-public/'
+  }
+}
+
+group = ext.group
+version = ext.version
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = ext.charset
+
+jar {
+  enabled = true
+
+  into("META-INF/maven/$project.group/$project.name") {
+    from { generatePomFileForMavenPublication }
+    rename ".*", "pom.xml"
+  }
+}
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+dependencies {
+
+  // lombok
+  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+  // junit
+  testImplementation group: 'junit', name: 'junit', version: versions.junit
+
+}
+
+// 实时更新 snapshots
+configurations.all {
+  resolutionStrategy.cacheDynamicVersionsFor 1, 'seconds'
+  resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
+}
+
+def env = System.getProperty("env") ?: "dev"
+apply from: "profile-${env}.gradle"

@@ -1,0 +1,14 @@
+
+
+ext {
+
+  group = 'com.c332030.util'
+  version = '0.0.1.RELEASE'
+
+  charset = 'utf-8'
+
+  versions = [
+    lombok: '1.18.12'
+    , junit: '4.13'
+  ]
+}

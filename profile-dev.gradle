@@ -1,0 +1,25 @@
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      groupId project.group
+      artifactId project.name
+      version project.version
+      from components.java
+    }
+  }
+
+  repositories {
+    maven {
+
+      def releasesRepoUrl = 'https://nexus.local.c332030.com/repository/maven-releases/'
+      def snapshotsRepoUrl = 'https://nexus.local.c332030.com/repository/maven-snapshots/'
+      url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+      credentials {
+        username System.getenv('nexus.username')
+        password System.getenv('nexus.password')
+      }
+    }
+  }
+}
